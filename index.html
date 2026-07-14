@@ -1,0 +1,746 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Do They Know You?</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,600;0,9..144,900;1,9..144,500&family=Space+Grotesk:wght@400;500;700&display=swap');
+
+:root{
+  --ink:#14213D;
+  --paper:#FBF7EE;
+  --coral:#FF5C5C;
+  --mustard:#FFC857;
+  --sage:#3F8F5E;
+  --charcoal:#1B1B1B;
+  --paper-dim:#F0EADA;
+}
+
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;}
+body{
+  background:var(--ink);
+  background-image:
+    radial-gradient(circle at 20% 10%, rgba(255,200,87,0.06), transparent 40%),
+    radial-gradient(circle at 80% 90%, rgba(255,92,92,0.06), transparent 40%);
+  color:var(--paper);
+  font-family:'Space Grotesk', sans-serif;
+  min-height:100vh;
+  padding:32px 16px 80px;
+}
+
+.wrap{max-width:640px;margin:0 auto;}
+
+.eyebrow{
+  font-size:13px;
+  letter-spacing:0.14em;
+  text-transform:uppercase;
+  color:var(--mustard);
+  font-weight:700;
+  margin-bottom:6px;
+}
+
+h1{
+  font-family:'Fraunces', serif;
+  font-weight:900;
+  font-size:clamp(2.2rem, 7vw, 3.4rem);
+  line-height:1.02;
+  margin:0 0 8px;
+  letter-spacing:-0.01em;
+}
+h1 em{
+  font-style:italic;
+  font-weight:500;
+  color:var(--coral);
+}
+
+.tagline{
+  font-size:16px;
+  color:rgba(251,247,238,0.65);
+  margin:0 0 32px;
+  max-width:46ch;
+}
+
+.card{
+  background:var(--paper);
+  color:var(--charcoal);
+  border-radius:2px;
+  padding:28px 26px;
+  box-shadow:0 18px 40px rgba(0,0,0,0.35);
+  position:relative;
+  margin-bottom:20px;
+}
+.card::before{
+  content:'';
+  position:absolute;
+  top:0;left:0;right:0;
+  height:6px;
+  background:repeating-linear-gradient(90deg, var(--coral) 0 14px, var(--mustard) 14px 28px);
+}
+
+.stack-choice{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:16px;
+}
+@media (max-width:480px){ .stack-choice{grid-template-columns:1fr;} }
+
+.choice-card{
+  background:var(--paper);
+  color:var(--charcoal);
+  border:2px solid transparent;
+  border-radius:2px;
+  padding:24px 20px;
+  cursor:pointer;
+  text-align:left;
+  font-family:inherit;
+  transition:transform .15s ease, border-color .15s ease;
+  box-shadow:0 10px 24px rgba(0,0,0,0.3);
+}
+.choice-card:hover{transform:translateY(-3px); border-color:var(--mustard);}
+.choice-card .cc-title{font-family:'Fraunces',serif;font-weight:700;font-size:1.3rem;margin:0 0 6px;}
+.choice-card .cc-sub{font-size:13px;color:#555;margin:0;}
+
+label{
+  display:block;
+  font-size:12px;
+  font-weight:700;
+  letter-spacing:0.06em;
+  text-transform:uppercase;
+  color:#666;
+  margin:16px 0 6px;
+}
+label:first-child{margin-top:0;}
+
+input[type=text]{
+  width:100%;
+  font-family:'Space Grotesk', sans-serif;
+  font-size:16px;
+  padding:11px 12px;
+  border:2px solid #ddd6c4;
+  border-radius:2px;
+  background:#fff;
+  color:var(--charcoal);
+}
+input[type=text]:focus{outline:none; border-color:var(--coral);}
+
+.q-block{
+  border:2px dashed #ddd6c4;
+  border-radius:2px;
+  padding:16px 16px 4px;
+  margin-top:18px;
+  position:relative;
+}
+.q-number{
+  position:absolute;
+  top:-13px; left:14px;
+  background:var(--ink);
+  color:var(--mustard);
+  font-family:'Fraunces',serif;
+  font-weight:700;
+  font-size:13px;
+  padding:2px 10px;
+  border-radius:12px;
+}
+.remove-q{
+  position:absolute; top:-13px; right:10px;
+  background:var(--coral); color:#fff; border:none;
+  width:22px;height:22px;border-radius:50%;
+  font-size:13px; cursor:pointer; line-height:1;
+}
+
+button.btn{
+  font-family:'Space Grotesk', sans-serif;
+  font-weight:700;
+  font-size:15px;
+  padding:13px 22px;
+  border:none;
+  border-radius:2px;
+  cursor:pointer;
+  transition:transform .12s ease, filter .12s ease;
+}
+button.btn:hover{transform:translateY(-2px); filter:brightness(1.05);}
+button.btn:active{transform:translateY(0);}
+.btn-primary{background:var(--coral); color:#fff;}
+.btn-secondary{background:var(--ink); color:var(--mustard);}
+.btn-ghost{background:transparent; color:var(--paper); border:2px solid rgba(251,247,238,0.4); }
+.btn-add{background:var(--paper-dim); color:var(--ink); width:100%; margin-top:14px;}
+.btn-row{display:flex; gap:10px; margin-top:22px; flex-wrap:wrap;}
+
+.link-box{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  background:#fff;
+  border:2px solid #ddd6c4;
+  border-radius:2px;
+  padding:10px 12px;
+  margin:10px 0 4px;
+}
+.link-box input{
+  border:none;
+  padding:4px 0;
+  font-size:14px;
+  color:var(--ink);
+  font-weight:600;
+  background:transparent;
+}
+.link-box input:focus{outline:none;}
+
+.answer-option{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  width:100%;
+  text-align:left;
+  background:#fff;
+  border:2px solid #ddd6c4;
+  border-radius:2px;
+  padding:10px 16px;
+  font-size:15px;
+  font-family:inherit;
+  color:var(--charcoal);
+  cursor:pointer;
+  margin-bottom:10px;
+  transition:border-color .12s ease, background .12s ease;
+}
+.answer-option img{
+  width:44px; height:44px;
+  object-fit:cover;
+  border-radius:2px;
+  border:1px solid #ddd6c4;
+  flex-shrink:0;
+  background:#f2ede0;
+}
+.answer-option span{flex:1;}
+.img-url-row{display:flex; gap:8px; align-items:flex-start;}
+.img-url-row input{flex:1;}
+.img-thumb-preview{
+  width:44px; height:44px; border-radius:2px; object-fit:cover;
+  border:1px solid #ddd6c4; flex-shrink:0; background:#f2ede0;
+}
+.answer-option:hover{border-color:var(--coral);}
+.answer-option.selected{border-color:var(--ink); background:var(--paper-dim); font-weight:700;}
+.answer-option.correct{border-color:var(--sage); background:#e7f4ec;}
+.answer-option.wrong{border-color:var(--coral); background:#fdeaea;}
+
+.stamp{
+  position:absolute;
+  top:8px; right:-6px;
+  font-family:'Fraunces', serif;
+  font-weight:900;
+  font-size:12px;
+  letter-spacing:0.08em;
+  padding:3px 10px;
+  border-radius:3px;
+  transform:rotate(8deg);
+  text-transform:uppercase;
+}
+.stamp.correct{background:var(--sage); color:#fff;}
+.stamp.wrong{background:var(--coral); color:#fff;}
+
+.score-hero{
+  text-align:center;
+  padding:10px 0 6px;
+}
+.score-num{
+  font-family:'Fraunces', serif;
+  font-weight:900;
+  font-size:4rem;
+  color:var(--ink);
+  line-height:1;
+}
+.score-label{font-size:13px; color:#777; text-transform:uppercase; letter-spacing:0.1em; font-weight:700;}
+
+.leader-row{
+  display:flex; justify-content:space-between; align-items:center;
+  padding:10px 4px; border-bottom:1px solid #e5ded0;
+  font-size:14px;
+}
+.leader-row:last-child{border-bottom:none;}
+.leader-name{font-weight:700;}
+.leader-score{font-family:'Fraunces',serif; font-weight:700; color:var(--ink);}
+
+.error-msg{
+  color:var(--coral);
+  font-size:13px;
+  font-weight:700;
+  margin-top:8px;
+}
+.hint{font-size:12px; color:#888; margin-top:-2px;}
+.small-link{
+  background:none;border:none;color:rgba(251,247,238,0.75);
+  text-decoration:underline; cursor:pointer; font-size:14px; padding:0;
+  font-family:inherit;
+}
+.progress{font-size:13px; color:#888; margin-bottom:4px; font-weight:700; letter-spacing:0.04em;}
+.bank-list{
+  display:flex; flex-wrap:wrap; gap:8px;
+  margin:12px 0 4px;
+  padding:14px;
+  background:var(--paper-dim);
+  border-radius:2px;
+}
+.bank-chip{
+  background:#fff;
+  border:1.5px solid #ddd6c4;
+  border-radius:14px;
+  padding:7px 13px;
+  font-size:13px;
+  font-family:inherit;
+  color:var(--charcoal);
+  cursor:pointer;
+  transition:border-color .12s ease, background .12s ease;
+}
+.bank-chip:hover{border-color:var(--coral); background:#fff5f5;}
+.whatsapp-btn{
+  background:#25D366; color:#fff;
+  display:inline-flex; align-items:center; gap:8px;
+  text-decoration:none;
+}
+.loading{color:rgba(251,247,238,0.6); font-size:14px;}
+</style>
+</head>
+<body>
+<div class="wrap" id="app"></div>
+
+<script>
+const app = document.getElementById('app');
+let state = { screen: 'home' };
+
+function esc(s){
+  const d = document.createElement('div');
+  d.textContent = s;
+  return d.innerHTML;
+}
+
+const QUESTION_BANK = [
+  { q: "What's my favorite drink?", options: ["Coffee", "Tea", "Juice", "Soft Drink"] },
+  { q: "What's my favorite food?", options: ["Pizza", "Burger", "Biryani", "Pasta"] },
+  { q: "What's my favorite color?", options: ["Blue", "Black", "Red", "Green"] },
+  { q: "Which season do I like the most?", options: ["Summer", "Winter", "Rainy", "Spring"] },
+  { q: "What's my dream travel destination?", options: ["Japan", "Switzerland", "Maldives", "Dubai"] },
+  { q: "What's my favorite dessert?", options: ["Ice Cream", "Cake", "Brownie", "Donut"] },
+  { q: "What's my favorite movie genre?", options: ["Action", "Comedy", "Horror", "Romance"] },
+  { q: "What's my favorite hobby?", options: ["Gaming", "Reading", "Watching Movies", "Sports"] },
+  { q: "What's my favorite fruit?", options: ["Mango", "Apple", "Orange", "Watermelon"] },
+  { q: "What's my favorite animal?", options: ["Dog", "Cat", "Rabbit", "Horse"] },
+  { q: "What's my favorite fast food?", options: ["Pizza", "Burger", "Fries", "Fried Chicken"] },
+  { q: "Which time of the day do I like most?", options: ["Morning", "Afternoon", "Evening", "Night"] },
+  { q: "What's my favorite sport?", options: ["Cricket", "Football", "Basketball", "Badminton"] },
+  { q: "What's my favorite music genre?", options: ["Pop", "Hip-Hop", "Rock", "Classical"] },
+  { q: "What's my favorite social media app?", options: ["Instagram", "YouTube", "Snapchat", "TikTok"] },
+  { q: "Which pet would I choose?", options: ["Dog", "Cat", "Fish", "Bird"] },
+  { q: "What's my favorite ice cream flavor?", options: ["Chocolate", "Vanilla", "Strawberry", "Butterscotch"] },
+  { q: "What's my favorite holiday?", options: ["Beach Vacation", "Mountain Trip", "City Tour", "Camping"] },
+  { q: "What's my favorite subject?", options: ["Math", "Science", "English", "History"] },
+  { q: "Which superpower would I choose?", options: ["Flying", "Invisibility", "Teleportation", "Time Travel"] },
+  { q: "What's my favorite snack?", options: ["Chips", "Popcorn", "Chocolate", "Cookies"] },
+  { q: "What's my favorite weather?", options: ["Sunny", "Rainy", "Snowy", "Windy"] },
+  { q: "What's my favorite flower?", options: ["Rose", "Sunflower", "Lily", "Tulip"] },
+  { q: "What's my favorite beverage?", options: ["Lemon Juice", "Milkshake", "Coffee", "Tea"] },
+  { q: "What's my favorite way to relax?", options: ["Sleeping", "Watching Movies", "Listening to Music", "Gaming"] },
+  { q: "Which place would I visit first?", options: ["Paris", "Bali", "New York", "Tokyo"] },
+  { q: "What's my favorite holiday festival?", options: ["Christmas", "Eid", "Diwali", "New Year"] },
+  { q: "What's my favorite type of clothing?", options: ["Casual", "Formal", "Sportswear", "Traditional"] },
+  { q: "What would I do on a free day?", options: ["Sleep", "Travel", "Play Games", "Watch Netflix"] },
+  { q: "What's my biggest dream?", options: ["Become Rich", "Travel the World", "Start a Business", "Buy My Dream House"] }
+];
+
+function genCode(){
+  const chars = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789';
+  let out = '';
+  for(let i=0;i<5;i++) out += chars[Math.floor(Math.random()*chars.length)];
+  return out;
+}
+
+function linkForCode(code){
+  return window.location.href.split('#')[0] + '#quiz=' + code;
+}
+
+async function saveQuiz(code, quiz){
+  return await window.storage.set('quiz:' + code, JSON.stringify(quiz), true);
+}
+async function loadQuiz(code){
+  try{
+    const r = await window.storage.get('quiz:' + code, true);
+    return r ? JSON.parse(r.value) : null;
+  }catch(e){ return null; }
+}
+async function loadResults(code){
+  try{
+    const r = await window.storage.get('results:' + code, true);
+    return r ? JSON.parse(r.value) : [];
+  }catch(e){ return []; }
+}
+async function saveResults(code, results){
+  return await window.storage.set('results:' + code, JSON.stringify(results), true);
+}
+
+function render(){
+  if(state.screen === 'home') return renderHome();
+  if(state.screen === 'create') return renderCreate();
+  if(state.screen === 'created') return renderCreated();
+  if(state.screen === 'enterCode') return renderEnterCode();
+  if(state.screen === 'takeQuiz') return renderTakeQuiz();
+  if(state.screen === 'results') return renderResults();
+}
+
+function renderHome(){
+  app.innerHTML = `
+    <div class="eyebrow">Friendship Trivia</div>
+    <h1>Do they <em>really</em><br>know you?</h1>
+    <p class="tagline">Make a quiz about yourself. Send the link to your friends. Find out who's paying attention.</p>
+    <div class="stack-choice">
+      <button class="choice-card" onclick="goCreate()">
+        <p class="cc-title">Make a quiz</p>
+        <p class="cc-sub">Write questions about yourself, get a link to share.</p>
+      </button>
+      <button class="choice-card" onclick="goEnterCode()">
+        <p class="cc-title">Take a quiz</p>
+        <p class="cc-sub">Got a link or code from a friend? Enter it here.</p>
+      </button>
+    </div>
+    <div class="card" style="margin-top:24px;">
+      <label style="margin-top:0;">How it works</label>
+      <div class="leader-row"><span>1</span><span style="flex:1;margin-left:10px;">Build a quiz about yourself — your own questions or a random shuffle from our bank.</span></div>
+      <div class="leader-row"><span>2</span><span style="flex:1;margin-left:10px;">Get a link and send it to your friends however you like.</span></div>
+      <div class="leader-row"><span>3</span><span style="flex:1;margin-left:10px;">They open it, enter their name, guess your answers, and get scored instantly.</span></div>
+      <div class="leader-row"><span>4</span><span style="flex:1;margin-left:10px;">Everyone's score lands on one shared board — see who really knows you.</span></div>
+    </div>
+  `;
+}
+
+function goCreate(){
+  state = { screen:'create', name:'', questions:[ blankQ() ], showBank:false };
+  render();
+}
+function blankQ(){ return { q:'', correct:'', correctImg:'', d1:'', d1Img:'', d2:'', d2Img:'', d3:'', d3Img:'' }; }
+
+function toggleBank(){ state.showBank = !state.showBank; render(); }
+
+function useBankQuestion(index){
+  const item = QUESTION_BANK[index];
+  const filled = { ...blankQ(), q: item.q, correct: item.options[0], d1: item.options[1], d2: item.options[2], d3: item.options[3] };
+  const empty = state.questions.find(q => !q.q.trim());
+  if(empty){ Object.assign(empty, filled); }
+  else { state.questions.push(filled); }
+  render();
+}
+
+function addRandomQuestions(n){
+  const usedTexts = new Set(state.questions.map(q => q.q.trim()).filter(Boolean));
+  const pool = QUESTION_BANK.filter(item => !usedTexts.has(item.q));
+  const picks = shuffleArray(pool).slice(0, n);
+  const filledPicks = picks.map(item => ({ ...blankQ(), q: item.q, correct: item.options[0], d1: item.options[1], d2: item.options[2], d3: item.options[3] }));
+  // drop any completely empty question blocks before adding the new batch
+  state.questions = state.questions.filter(q => q.q.trim() || q.correct.trim() || q.d1.trim() || q.d2.trim() || q.d3.trim());
+  state.questions.push(...filledPicks);
+  if(state.questions.length === 0){ state.questions.push(blankQ()); }
+  render();
+}
+
+function goEnterCode(){
+  state = { screen:'enterCode', code:'', error:'' };
+  render();
+}
+
+function renderCreate(){
+  const qBlocks = state.questions.map((qq, i) => `
+    <div class="q-block">
+      <span class="q-number">Q${i+1}</span>
+      ${state.questions.length > 1 ? `<button class="remove-q" onclick="removeQ(${i})">&times;</button>` : ''}
+      <label>Question</label>
+      <input type="text" placeholder="e.g. What's my go-to comfort food?" value="${esc(qq.q)}" oninput="updateQ(${i},'q',this.value)">
+      <label>Correct answer</label>
+      <div class="img-url-row">
+        <input type="text" placeholder="The real answer, e.g. Tea" value="${esc(qq.correct)}" oninput="updateQ(${i},'correct',this.value)">
+        <input type="text" placeholder="Image URL (optional)" value="${esc(qq.correctImg)}" oninput="updateQ(${i},'correctImg',this.value)" style="max-width:170px;">
+        ${qq.correctImg ? `<img class="img-thumb-preview" src="${esc(qq.correctImg)}" onerror="this.style.visibility='hidden'">` : ''}
+      </div>
+      <label>Decoy answer 1</label>
+      <div class="img-url-row">
+        <input type="text" placeholder="A believable wrong answer" value="${esc(qq.d1)}" oninput="updateQ(${i},'d1',this.value)">
+        <input type="text" placeholder="Image URL (optional)" value="${esc(qq.d1Img)}" oninput="updateQ(${i},'d1Img',this.value)" style="max-width:170px;">
+        ${qq.d1Img ? `<img class="img-thumb-preview" src="${esc(qq.d1Img)}" onerror="this.style.visibility='hidden'">` : ''}
+      </div>
+      <label>Decoy answer 2</label>
+      <div class="img-url-row">
+        <input type="text" placeholder="Another wrong answer" value="${esc(qq.d2)}" oninput="updateQ(${i},'d2',this.value)">
+        <input type="text" placeholder="Image URL (optional)" value="${esc(qq.d2Img)}" oninput="updateQ(${i},'d2Img',this.value)" style="max-width:170px;">
+        ${qq.d2Img ? `<img class="img-thumb-preview" src="${esc(qq.d2Img)}" onerror="this.style.visibility='hidden'">` : ''}
+      </div>
+      <label>Decoy answer 3</label>
+      <div class="img-url-row">
+        <input type="text" placeholder="A third wrong answer" value="${esc(qq.d3)}" oninput="updateQ(${i},'d3',this.value)">
+        <input type="text" placeholder="Image URL (optional)" value="${esc(qq.d3Img)}" oninput="updateQ(${i},'d3Img',this.value)" style="max-width:170px;">
+        ${qq.d3Img ? `<img class="img-thumb-preview" src="${esc(qq.d3Img)}" onerror="this.style.visibility='hidden'">` : ''}
+      </div>
+      <p class="hint">Paste a link to an image (right-click any web image &rarr; "Copy image address"). Leave blank for text-only.</p>
+    </div>
+  `).join('');
+
+  app.innerHTML = `
+    <div class="eyebrow">Building your quiz</div>
+    <h1>Quiz me, <em>friend</em></h1>
+    <div class="card">
+      <label>Your name</label>
+      <input type="text" id="creatorName" placeholder="So friends know whose quiz this is" value="${esc(state.name)}" oninput="state.name=this.value">
+      <button class="btn btn-add" type="button" onclick="toggleBank()">${state.showBank ? 'Hide' : 'Need ideas? Browse'} ready-made questions</button>
+      <button class="btn btn-add" type="button" onclick="addRandomQuestions(10)" style="margin-top:8px;">🎲 Shuffle in 10 random questions</button>
+      ${state.showBank ? `
+        <div class="bank-list">
+          ${QUESTION_BANK.map((item,bi) => `<button class="bank-chip" onclick="useBankQuestion(${bi})">${esc(item.q)}</button>`).join('')}
+        </div>
+        <p class="hint">Tapping one fills in the question plus four suggested answers — mark which one is actually true, edit any of them, or swap them out.</p>
+      ` : ''}
+      ${qBlocks}
+      <button class="btn btn-add" onclick="addQ()">+ Add another question</button>
+      ${state.error ? `<div class="error-msg">${esc(state.error)}</div>` : ''}
+      <div class="btn-row">
+        <button class="btn btn-primary" onclick="submitQuiz()">Create quiz</button>
+        <button class="btn btn-ghost" onclick="state={screen:'home'};render()" style="color:#888;border-color:#ccc;">Cancel</button>
+      </div>
+    </div>
+  `;
+}
+
+function updateQ(i, field, val){ state.questions[i][field] = val; }
+function addQ(){ state.questions.push(blankQ()); render(); }
+function removeQ(i){ state.questions.splice(i,1); render(); }
+
+async function submitQuiz(){
+  if(!state.name.trim()){ state.error = 'Add your name so friends know whose quiz this is.'; render(); return; }
+  for(const q of state.questions){
+    if(!q.q.trim() || !q.correct.trim() || !q.d1.trim() || !q.d2.trim() || !q.d3.trim()){
+      state.error = 'Fill in every question, the correct answer, and all three decoys.';
+      render();
+      return;
+    }
+  }
+  const code = genCode();
+  const quiz = {
+    creatorName: state.name.trim(),
+    questions: state.questions.map(q => ({
+      q: q.q.trim(),
+      correct: { text: q.correct.trim(), img: q.correctImg.trim() },
+      decoys: [
+        { text: q.d1.trim(), img: q.d1Img.trim() },
+        { text: q.d2.trim(), img: q.d2Img.trim() },
+        { text: q.d3.trim(), img: q.d3Img.trim() }
+      ]
+    })),
+    createdAt: Date.now()
+  };
+  const ok = await saveQuiz(code, quiz);
+  if(!ok){ state.error = "Couldn't save the quiz — try again."; render(); return; }
+  await saveResults(code, []);
+  state = { screen:'created', code, quiz };
+  render();
+}
+
+function renderCreated(){
+  const link = linkForCode(state.code);
+  const shareText = encodeURIComponent(`Think you know me? 👀 Take my quiz and prove it: ${link}`);
+  app.innerHTML = `
+    <div class="eyebrow">You're all set</div>
+    <h1>Send this <em>link</em></h1>
+    <div class="card">
+      <label>Your quiz link</label>
+      <div class="link-box">
+        <input type="text" id="quizLinkInput" readonly value="${esc(link)}">
+      </div>
+      <p class="hint">Share this with friends — opening it takes them straight into your quiz. You'll see everyone's scores as they come in.</p>
+      <div class="btn-row">
+        <button class="btn btn-primary" onclick="copyLink()">Copy link</button>
+        <a class="btn whatsapp-btn" href="https://wa.me/?text=${shareText}" target="_blank" rel="noopener">Share on WhatsApp</a>
+        <button class="btn btn-secondary" onclick="viewLeaderboard('${state.code}')">See who's answered</button>
+      </div>
+    </div>
+    <button class="small-link" onclick="state={screen:'home'};render()">&larr; Back home</button>
+  `;
+}
+
+function copyLink(){
+  const link = linkForCode(state.code);
+  navigator.clipboard.writeText(link).catch(()=>{});
+  const btn = event.target;
+  const old = btn.textContent;
+  btn.textContent = 'Copied!';
+  setTimeout(()=>{ btn.textContent = old; }, 1400);
+}
+
+async function viewLeaderboard(code){
+  const quiz = await loadQuiz(code);
+  const results = await loadResults(code);
+  state = { screen:'results', code, quiz, results, justSubmitted:false };
+  render();
+}
+
+function renderEnterCode(){
+  app.innerHTML = `
+    <div class="eyebrow">Prove yourself</div>
+    <h1>Got a <em>code</em>?</h1>
+    <div class="card">
+      <label>Enter quiz code</label>
+      <input type="text" id="codeInput" placeholder="e.g. K7RXT" value="${esc(state.code)}" style="text-transform:uppercase;" oninput="state.code=this.value.toUpperCase()">
+      ${state.error ? `<div class="error-msg">${esc(state.error)}</div>` : ''}
+      <div class="btn-row">
+        <button class="btn btn-primary" onclick="loadQuizForTaking()">Start quiz</button>
+        <button class="btn btn-ghost" onclick="state={screen:'home'};render()" style="color:#888;border-color:#ccc;">Cancel</button>
+      </div>
+    </div>
+  `;
+}
+
+async function loadQuizForTaking(codeOverride){
+  const code = (codeOverride || state.code).trim().toUpperCase();
+  if(!code){ state.error='Enter a code first.'; render(); return; }
+  app.innerHTML = `<p class="loading">Looking up that quiz...</p>`;
+  const quiz = await loadQuiz(code);
+  if(!quiz){ state = { screen:'enterCode', code, error:"Couldn't find a quiz with that code. Double-check the link with your friend." }; render(); return; }
+  const orderedQuestions = shuffleArray(quiz.questions);
+  state = { screen:'takeQuiz', code, quiz, orderedQuestions, current:0, answers:[], takerName:'', pickedIdx:null, options: shuffleOptions(orderedQuestions[0]) };
+  render();
+}
+
+function shuffleOptions(question){
+  const opts = [question.correct, ...question.decoys].map((a,i)=>({text:a.text, img:a.img, isCorrect:i===0}));
+  for(let i=opts.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [opts[i],opts[j]] = [opts[j],opts[i]];
+  }
+  return opts;
+}
+
+function shuffleArray(arr){
+  const out = [...arr];
+  for(let i=out.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [out[i],out[j]] = [out[j],out[i]];
+  }
+  return out;
+}
+
+function renderTakeQuiz(){
+  const q = state.orderedQuestions[state.current];
+  const total = state.orderedQuestions.length;
+
+  if(state.current === 0 && !state.nameConfirmed){
+    app.innerHTML = `
+      <div class="eyebrow">${esc(state.quiz.creatorName)}'s quiz</div>
+      <h1>How well do <em>you</em> know them?</h1>
+      <div class="card">
+        <label>Your name</label>
+        <input type="text" placeholder="So they know who scored what" value="${esc(state.takerName)}" oninput="state.takerName=this.value">
+        <p class="hint">Required — your name and score will be visible to everyone who takes this quiz.</p>
+        ${state.nameError ? `<div class="error-msg">${esc(state.nameError)}</div>` : ''}
+        <div class="btn-row">
+          <button class="btn btn-primary" onclick="confirmName()">Begin</button>
+        </div>
+      </div>
+    `;
+    return;
+  }
+
+  app.innerHTML = `
+    <div class="eyebrow">${esc(state.quiz.creatorName)}'s quiz</div>
+    <div class="progress">Question ${state.current+1} of ${total}</div>
+    <div class="card">
+      <h1 style="font-size:1.5rem; margin-bottom:18px;">${esc(q.q)}</h1>
+      <div id="optionsWrap">
+        ${state.options.map((o,i)=>`
+          <button class="answer-option" onclick="pickOption(${i})">
+            ${o.img ? `<img src="${esc(o.img)}" onerror="this.style.display='none'">` : ''}
+            <span>${esc(o.text)}</span>
+          </button>
+        `).join('')}
+      </div>
+    </div>
+    <button class="small-link" onclick="viewLeaderboard('${state.code}')">See everyone's scores so far &rarr;</button>
+  `;
+}
+
+function confirmName(){
+  if(!state.takerName.trim()){ state.nameError = 'Enter your name to continue.'; render(); return; }
+  state.nameError = '';
+  state.nameConfirmed = true;
+  render();
+}
+
+function pickOption(i){
+  if(state.locked) return;
+  state.locked = true;
+  const chosen = state.options[i];
+  state.answers.push({ question: state.orderedQuestions[state.current].q, chosenText: chosen.text, correct: chosen.isCorrect });
+
+  const buttons = document.querySelectorAll('.answer-option');
+  buttons.forEach((b, idx) => {
+    b.style.pointerEvents = 'none';
+    if(state.options[idx].isCorrect) b.classList.add('correct');
+    else if(idx === i) b.classList.add('wrong');
+  });
+
+  setTimeout(()=>{
+    state.locked = false;
+    const next = state.current + 1;
+    if(next < state.orderedQuestions.length){
+      state.current = next;
+      state.options = shuffleOptions(state.orderedQuestions[next]);
+      render();
+    } else {
+      finishQuiz();
+    }
+  }, 900);
+}
+
+async function finishQuiz(){
+  const score = state.answers.filter(a=>a.correct).length;
+  const total = state.orderedQuestions.length;
+  const results = await loadResults(state.code);
+  const updated = [...results, { name: state.takerName.trim(), score, total, submittedAt: Date.now() }];
+  await saveResults(state.code, updated);
+  state = { screen:'results', code: state.code, quiz: state.quiz, results: updated, justSubmitted:true, myScore:score, myTotal:total, myName:state.takerName.trim(), answers: state.answers };
+  render();
+}
+
+function renderResults(){
+  const sorted = [...state.results].sort((a,b)=> (b.score/b.total) - (a.score/a.total));
+  app.innerHTML = `
+    <div class="eyebrow">${esc(state.quiz.creatorName)}'s quiz</div>
+    <h1>${state.justSubmitted ? 'Nice try!' : 'Leaderboard'}</h1>
+    ${state.justSubmitted ? `
+      <div class="card score-hero">
+        <div class="score-num">${state.myScore}/${state.myTotal}</div>
+        <div class="score-label">${Math.round((state.myScore/state.myTotal)*100)}% — ${esc(state.myName)}'s score</div>
+      </div>
+    ` : ''}
+    <div class="card">
+      <label style="margin-top:0;">Who knows ${esc(state.quiz.creatorName)} best</label>
+      ${sorted.length === 0 ? '<p class="hint">No one has taken this quiz yet.</p>' :
+        sorted.map(r => `
+          <div class="leader-row">
+            <span class="leader-name">${esc(r.name)}</span>
+            <span class="leader-score">${r.score}/${r.total} &middot; ${Math.round((r.score/r.total)*100)}%</span>
+          </div>
+        `).join('')
+      }
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-secondary" onclick="goCreate()">Make your own quiz</button>
+      <button class="btn btn-ghost" onclick="state={screen:'home'};render()">Back home</button>
+    </div>
+  `;
+}
+
+// If the URL contains a shared quiz link (#quiz=CODE), jump straight into taking that quiz.
+const hashMatch = window.location.hash.match(/quiz=([A-Za-z0-9]+)/);
+if(hashMatch){
+  state = { screen:'enterCode', code: hashMatch[1].toUpperCase(), error:'' };
+  loadQuizForTaking(hashMatch[1].toUpperCase());
+} else {
+  render();
+}
+</script>
+</body>
+</html>
